@@ -3,12 +3,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdbool.h>
+#include "lsh_colors.h"
 
 /**
  * @brief Signal handler for SIGINT.
  * @param signum The signal number.
  */
 void sigint_handler(int signum) { }
+
+/**
+ * @return Wheter the terminal supports ANSI escape codes or not.
+*/
+bool supports_ansi_escape_codes()
+{
+    return isatty(fileno(stdout));
+}
 
 /**
  * @brief Get the current username.
@@ -27,16 +37,16 @@ char *get_hostname()
 {
     char *hostname = (char *)malloc(256);
     if (hostname != NULL) {
-        if (gethostname(hostname, 256) == 0) {
+        if (gethostname(hostname, 256) == 0)
             return hostname;
-        } else {
-            free(hostname);
-            return NULL;
-        }
-    } else {
-        perror("malloc");
+
+        free(hostname);
         return NULL;
+
     }
+
+    perror("malloc");
+    return NULL;
 }
 
 char *get_user_at_hostname()
@@ -44,18 +54,32 @@ char *get_user_at_hostname()
     char *username = get_current_username();
     char *hostname = get_hostname();
 
+    if (supports_ansi_escape_codes()) {
+        char formatted_username[strlen(COLOR_GREEN) + strlen(username) + strlen(COLOR_RESET)];
+        sprintf(formatted_username, "%s%s%s", COLOR_GREEN, username, COLOR_RESET);
+        username = strdup(formatted_username);
+
+        char formatted_hostname[strlen(COLOR_BLUE) + strlen(hostname) + strlen(COLOR_RESET)];
+        sprintf(formatted_hostname, "%s%s%s", COLOR_BLUE, hostname, COLOR_RESET);
+        hostname = strdup(formatted_hostname);
+    }
+
+
     if (username != NULL && hostname != NULL) {
         char *result = (char *)malloc(strlen(username) + strlen(hostname) + 2);
         if (result != NULL) {
             sprintf(result, "%s@%s", username, hostname);
+            free(username);
             return result;
-        } else {
-            perror("malloc");
-            return NULL;
         }
-    } else {
+
+        perror("malloc");
+        free(username);
         return NULL;
     }
+
+    free(username);
+    return NULL;
 }
 
 /**
@@ -91,9 +115,10 @@ char *expand_tilde(const char *path) {
     return result;
 }
 
+
 char *get_current_dir() {
     char *cwd = NULL;
-    size_t size = 1024; // Initial buffer size
+    size_t size = 1024;
 
     do {
         cwd = (char *)realloc(cwd, size);
@@ -105,14 +130,27 @@ char *get_current_dir() {
         if (getcwd(cwd, size) != NULL) {
             char *expanded = expand_tilde(cwd);
             free(cwd);
-            return expanded;
+
+            if(!supports_ansi_escape_codes())
+                return expanded;
+            
+            char *magenta_expanded = (char *)malloc(strlen(COLOR_MAGENTA) + strlen(expanded) + strlen(COLOR_RESET));
+            if (magenta_expanded == NULL) {
+                perror("malloc");
+                free(expanded);
+                return NULL;
+            }
+
+            sprintf(magenta_expanded, "\x1B[35m%s\x1B[0m", expanded);
+            return magenta_expanded;
+
         } else if (errno == ERANGE) {
-            // The buffer was too small; try again with a larger size.
             size *= 2;
         } else {
             perror("getcwd() error");
             free(cwd);
             return NULL;
         }
+        
     } while (1);
 }

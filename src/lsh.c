@@ -147,7 +147,7 @@ void lsh_loop(void)
 
         cwd = get_current_dir();
         
-        printf("%s %s> ", user_information, cwd);
+        printf("%s:%s> ", user_information, cwd);
 
         line = lsh_read_line();
         args = lsh_split_line(line);
