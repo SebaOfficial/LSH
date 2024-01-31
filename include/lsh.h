@@ -39,4 +39,11 @@ char **lsh_split_line(char *line);
 */
 void lsh_loop(void);
 
+/**
+ * @brief Signal handler for SIGINT (Ctrl+C). Forces the user to use 'exit' to quit the shell.
+ * @param signum The signal number (should be SIGINT).
+ * @return void.
+ */
+void sigint_handler(int signum);
+
 #endif

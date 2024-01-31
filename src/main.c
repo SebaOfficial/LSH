@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <signal.h>
 #include "lsh.h"
-#include "lsh_helpers.h"
 
 
 int main(int argc, char **argv) {
