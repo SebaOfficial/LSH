@@ -13,13 +13,6 @@ extern char *builtin_str[];
 extern int (*builtin_func[]) (char **);
 
 /**
- * @return The number of builin functions.
-*/
-int lsh_num_builtins() {
-    return LSH_NUM_BUILTIN_FUNCTIONS;
-}
-
-/**
  * @brief Launch a program and wait for it to terminate.
  * @param args Null terminated list of arguments (including program).
  * @return Always returns 1, to continue execution.

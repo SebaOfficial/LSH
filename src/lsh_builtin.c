@@ -17,6 +17,11 @@ int (*builtin_func[LSH_NUM_BUILTIN_FUNCTIONS]) (char **) = {
     &lsh_exit
 };
 
+int lsh_num_builtins()
+{
+    return LSH_NUM_BUILTIN_FUNCTIONS;
+}
+
 int lsh_cd(char **args)
 {
     if (args[1] == NULL) {
