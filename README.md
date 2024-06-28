@@ -9,9 +9,13 @@ Since its purpose is demonstration (not feature completeness or even fitness for
 * Non piping or redirection;
 * Only builtins are: `cd`, `help`, `exit`.
 
-## Running
+## Build
+You can either build with `make` or download the latest artifact in the [actions](https://github.com/SebaOfficial/LSH/actions/workflows/build.yml).
+
+## Run
+If you downloaded the artifact you first need to extract the `lsh` file from the zip, then you can just run it (*make sure it's executable*).
 ```
-make && ./lsh
+./lsh
 ```
 
 ## License
