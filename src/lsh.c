@@ -7,6 +7,9 @@
 #include "lsh.h"
 #include "lsh_builtin.h"
 #include "lsh_helpers.h"
+#include "lsh_colors.h"
+
+int last_exit_code = 0;
 
 extern char *builtin_str[];
 extern int (*builtin_func[])(char **);
@@ -15,7 +18,6 @@ extern int (*builtin_func[])(char **);
  * @brief Launch a program and wait for it to terminate.
  * @param args Null terminated list of arguments (including program).
  * @return Always returns 1, to continue execution.
- *
  */
 int lsh_launch(char **args)
 {
@@ -44,6 +46,8 @@ int lsh_launch(char **args)
         {
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+
+        last_exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : (WIFSIGNALED(status) ? 128 + WTERMSIG(status) : 1);
     }
 
     return 1;
@@ -157,7 +161,8 @@ void lsh_print_prompt(void)
 {
     char *user_information = get_user_at_hostname();
     char *cwd = get_current_dir();
-    printf("%s:%s> ", user_information, cwd);
+    char *prompt = last_exit_code != 0 ? COLOR_RED ">" COLOR_RESET : ">";
+    printf("%s:%s%s ", user_information, cwd, prompt);
     fflush(stdout);
     free(user_information);
     free(cwd);
