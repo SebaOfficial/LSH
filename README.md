@@ -6,7 +6,7 @@ Since its purpose is demonstration (not feature completeness or even fitness for
 * Commands must be on a single line;
 * Arguments must be separated by a whitespace;
 * No quoting arguments or escaping whitespace;
-* Non piping or redirection;
+* No piping nor redirection;
 * Only builtins are: `cd`, `help`, `exit`.
 
 ## Build
