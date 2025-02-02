@@ -148,8 +148,16 @@ void lsh_loop(void)
         cwd = get_current_dir();
         
         printf("%s:%s> ", user_information, cwd);
+        fflush(stdout);
 
         line = lsh_read_line();
+
+        if (line == NULL) { // EOF
+            free(line);
+            printf("\n");
+            break;
+        }
+
         args = lsh_split_line(line);
         status = lsh_execute(args);
 
