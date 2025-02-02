@@ -82,7 +82,7 @@ int lsh_execute(char **args)
 char *lsh_read_line(void)
 {
     char *line = NULL;
-    size_t bufsize = 0; // have getline allocate a buffer for us
+    size_t bufsize = 0;
     ssize_t bytes_read;
 
     bytes_read = getline(&line, &bufsize, stdin);
@@ -153,21 +153,25 @@ char **lsh_split_line(char *line)
     return tokens;
 }
 
+void lsh_print_prompt(void)
+{
+    char *user_information = get_user_at_hostname();
+    char *cwd = get_current_dir();
+    printf("%s:%s> ", user_information, cwd);
+    fflush(stdout);
+    free(user_information);
+    free(cwd);
+}
+
 void lsh_loop(void)
 {
     char *line;
     char **args;
     int status;
-    char *cwd;
-    char *user_information = get_user_at_hostname();
 
     do
     {
-
-        cwd = get_current_dir();
-
-        printf("%s:%s> ", user_information, cwd);
-        fflush(stdout);
+        lsh_print_prompt();
 
         line = lsh_read_line();
 
@@ -183,9 +187,6 @@ void lsh_loop(void)
 
         free(line);
         free(args);
-        free(cwd);
 
     } while (status);
-
-    free(user_information);
 }

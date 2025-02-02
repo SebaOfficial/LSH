@@ -13,4 +13,10 @@ char *get_user_at_hostname();
  */
 char *get_current_dir();
 
+/**
+ * @brief Signal handler for SIGINT (Ctrl+C).
+ * @param signum The signal number (should be SIGINT).
+ */
+void sigint_handler(int signum);
+
 #endif

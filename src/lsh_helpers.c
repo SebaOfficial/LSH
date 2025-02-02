@@ -5,12 +5,14 @@
 #include <errno.h>
 #include <stdbool.h>
 #include "lsh_colors.h"
+#include "lsh.h"
 
-/**
- * @brief Signal handler for SIGINT.
- * @param signum The signal number.
- */
-void sigint_handler(int signum) {}
+void sigint_handler(int signum)
+{
+    (void)signum;
+    printf("\n");
+    lsh_print_prompt();
+}
 
 /**
  * @return Wheter the terminal supports ANSI escape codes or not.

@@ -10,10 +10,8 @@
 void lsh_loop(void);
 
 /**
- * @brief Signal handler for SIGINT (Ctrl+C). Forces the user to use 'exit' to quit the shell.
- * @param signum The signal number (should be SIGINT).
- * @return void.
+ * @brief Prints the prompt line. 
  */
-void sigint_handler(int signum);
+void lsh_print_prompt(void);
 
 #endif
