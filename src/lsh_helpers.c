@@ -10,11 +10,11 @@
  * @brief Signal handler for SIGINT.
  * @param signum The signal number.
  */
-void sigint_handler(int signum) { }
+void sigint_handler(int signum) {}
 
 /**
  * @return Wheter the terminal supports ANSI escape codes or not.
-*/
+ */
 bool supports_ansi_escape_codes()
 {
     return isatty(fileno(stdout));
@@ -36,13 +36,13 @@ char *get_current_username()
 char *get_hostname()
 {
     char *hostname = (char *)malloc(256);
-    if (hostname != NULL) {
+    if (hostname != NULL)
+    {
         if (gethostname(hostname, 256) == 0)
             return hostname;
 
         free(hostname);
         return NULL;
-
     }
 
     perror("malloc");
@@ -54,7 +54,8 @@ char *get_user_at_hostname()
     char *username = get_current_username();
     char *hostname = get_hostname();
 
-    if (supports_ansi_escape_codes()) {
+    if (supports_ansi_escape_codes())
+    {
         char formatted_username[strlen(COLOR_GREEN) + strlen(username) + strlen(COLOR_RESET)];
         sprintf(formatted_username, "%s%s%s", COLOR_GREEN, username, COLOR_RESET);
         username = strdup(formatted_username);
@@ -64,10 +65,11 @@ char *get_user_at_hostname()
         hostname = strdup(formatted_hostname);
     }
 
-
-    if (username != NULL && hostname != NULL) {
+    if (username != NULL && hostname != NULL)
+    {
         char *result = (char *)malloc(strlen(username) + strlen(hostname) + 2);
-        if (result != NULL) {
+        if (result != NULL)
+        {
             sprintf(result, "%s@%s", username, hostname);
             free(username);
             return result;
@@ -87,26 +89,33 @@ char *get_user_at_hostname()
  * @param path The path containing a tilde (~).
  * @return A pointer to the resulting string.
  */
-char *expand_tilde(const char *path) {
+char *expand_tilde(const char *path)
+{
     const char *home = getenv("HOME");
-    if (home == NULL) {
+    if (home == NULL)
+    {
         fprintf(stderr, "Unable to get the home directory.\n");
         return NULL;
     }
 
     char *result = NULL;
-    if (strstr(path, home) == path) {
+    if (strstr(path, home) == path)
+    {
         size_t new_size = strlen(path) + strlen(home) + 1;
         result = (char *)malloc(new_size);
-        if (result == NULL) {
+        if (result == NULL)
+        {
             perror("malloc");
             return NULL;
         }
 
         snprintf(result, new_size, "~%s", path + strlen(home));
-    } else {
+    }
+    else
+    {
         result = strdup(path);
-        if (result == NULL) {
+        if (result == NULL)
+        {
             perror("strdup");
             return NULL;
         }
@@ -115,27 +124,31 @@ char *expand_tilde(const char *path) {
     return result;
 }
 
-
-char *get_current_dir() {
+char *get_current_dir()
+{
     char *cwd = NULL;
     size_t size = 1024;
 
-    do {
+    do
+    {
         cwd = (char *)realloc(cwd, size);
-        if (cwd == NULL) {
+        if (cwd == NULL)
+        {
             perror("realloc");
             return NULL;
         }
 
-        if (getcwd(cwd, size) != NULL) {
+        if (getcwd(cwd, size) != NULL)
+        {
             char *expanded = expand_tilde(cwd);
             free(cwd);
 
-            if(!supports_ansi_escape_codes())
+            if (!supports_ansi_escape_codes())
                 return expanded;
-            
+
             char *magenta_expanded = (char *)malloc(strlen(COLOR_MAGENTA) + strlen(expanded) + strlen(COLOR_RESET));
-            if (magenta_expanded == NULL) {
+            if (magenta_expanded == NULL)
+            {
                 perror("malloc");
                 free(expanded);
                 return NULL;
@@ -143,14 +156,17 @@ char *get_current_dir() {
 
             sprintf(magenta_expanded, "\x1B[35m%s\x1B[0m", expanded);
             return magenta_expanded;
-
-        } else if (errno == ERANGE) {
+        }
+        else if (errno == ERANGE)
+        {
             size *= 2;
-        } else {
+        }
+        else
+        {
             perror("getcwd() error");
             free(cwd);
             return NULL;
         }
-        
+
     } while (1);
 }

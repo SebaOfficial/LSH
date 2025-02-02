@@ -6,7 +6,7 @@
 
 /**
  * @brief Loop getting input and executing it.
-*/
+ */
 void lsh_loop(void);
 
 /**

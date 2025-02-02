@@ -8,34 +8,40 @@
 #include "lsh_builtin.h"
 #include "lsh_helpers.h"
 
-
 extern char *builtin_str[];
-extern int (*builtin_func[]) (char **);
+extern int (*builtin_func[])(char **);
 
 /**
  * @brief Launch a program and wait for it to terminate.
  * @param args Null terminated list of arguments (including program).
  * @return Always returns 1, to continue execution.
- * 
-*/
+ *
+ */
 int lsh_launch(char **args)
 {
     pid_t pid;
     int status;
 
     pid = fork();
-    if (pid == 0) {
-      // Child process
-        if (execvp(args[0], args) == -1) {
+    if (pid == 0)
+    {
+        // Child process
+        if (execvp(args[0], args) == -1)
+        {
             perror("lsh");
         }
         exit(EXIT_FAILURE);
-    } else if (pid < 0) {
+    }
+    else if (pid < 0)
+    {
         // Error forking
         perror("lsh");
-    } else {
+    }
+    else
+    {
         // Parent process
-        do {
+        do
+        {
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
@@ -47,18 +53,21 @@ int lsh_launch(char **args)
  * @brief Execute shell built-in or launch program.
  * @param args Null terminated list of arguments.
  * @return 1 if the shell should continue running, 0 if it should terminate
-*/
+ */
 int lsh_execute(char **args)
 {
     int i;
 
-    if (args[0] == NULL) {
+    if (args[0] == NULL)
+    {
         // An empty command was entered.
         return 1;
     }
 
-    for (i = 0; i < lsh_num_builtins(); i++) {
-        if (strcmp(args[0], builtin_str[i]) == 0) {
+    for (i = 0; i < lsh_num_builtins(); i++)
+    {
+        if (strcmp(args[0], builtin_str[i]) == 0)
+        {
             return (*builtin_func[i])(args);
         }
     }
@@ -69,26 +78,32 @@ int lsh_execute(char **args)
 /**
  * @brief Read a line of input from stdin.
  * @return The line from stdin.
-*/
-char *lsh_read_line(void) {
+ */
+char *lsh_read_line(void)
+{
     char *line = NULL;
     size_t bufsize = 0; // have getline allocate a buffer for us
     ssize_t bytes_read;
 
     bytes_read = getline(&line, &bufsize, stdin);
-    
-    if (bytes_read == -1) {
-        if (feof(stdin)) {
+
+    if (bytes_read == -1)
+    {
+        if (feof(stdin))
+        {
             free(line);
             return NULL;
-        } else {
+        }
+        else
+        {
             perror("lsh: getline");
             free(line);
             return NULL;
         }
     }
 
-    if (bytes_read > 0 && line[bytes_read - 1] == '\n') {
+    if (bytes_read > 0 && line[bytes_read - 1] == '\n')
+    {
         line[bytes_read - 1] = '\0';
     }
 
@@ -99,34 +114,37 @@ char *lsh_read_line(void) {
  * @brief Split a line into tokens (very naively).
  * @param line The line.
  * @return Null-terminated array of tokens.
-*/
+ */
 char **lsh_split_line(char *line)
 {
     int bufsize = LSH_TOK_BUFSIZE, position = 0;
-    char **tokens = malloc(bufsize * sizeof(char*));
+    char **tokens = malloc(bufsize * sizeof(char *));
     char *token, **tokens_backup;
 
-    if (!tokens) {
+    if (!tokens)
+    {
         fprintf(stderr, "lsh: allocation error\n");
         exit(EXIT_FAILURE);
     }
 
     token = strtok(line, LSH_TOK_DELIM);
-    while (token != NULL) {
+    while (token != NULL)
+    {
         tokens[position] = token;
         position++;
 
-        if (position >= bufsize) {
+        if (position >= bufsize)
+        {
             bufsize += LSH_TOK_BUFSIZE;
             tokens_backup = tokens;
-            tokens = realloc(tokens, bufsize * sizeof(char*));
-            
-            if (!tokens) {
+            tokens = realloc(tokens, bufsize * sizeof(char *));
+
+            if (!tokens)
+            {
                 free(tokens_backup);
                 fprintf(stderr, "lsh: allocation error\n");
                 exit(EXIT_FAILURE);
             }
-
         }
 
         token = strtok(NULL, LSH_TOK_DELIM);
@@ -143,16 +161,18 @@ void lsh_loop(void)
     char *cwd;
     char *user_information = get_user_at_hostname();
 
-    do {
+    do
+    {
 
         cwd = get_current_dir();
-        
+
         printf("%s:%s> ", user_information, cwd);
         fflush(stdout);
 
         line = lsh_read_line();
 
-        if (line == NULL) { // EOF
+        if (line == NULL) // EOF
+        {
             free(line);
             printf("\n");
             break;
@@ -168,5 +188,4 @@ void lsh_loop(void)
     } while (status);
 
     free(user_information);
-
 }

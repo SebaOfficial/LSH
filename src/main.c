@@ -3,12 +3,12 @@
 #include <signal.h>
 #include "lsh.h"
 
-
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     printf("Welcome to LSH!\nType help to get more information\n");
 
     signal(SIGINT, sigint_handler);
-    
+
     lsh_loop();
 
     printf("Bye!\n");
